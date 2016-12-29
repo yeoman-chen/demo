@@ -1,6 +1,6 @@
 <?php
 $workers = [];
-$worker_num = 5;
+$worker_num = 2;
 
 for($i = 0; $i < $worker_num; $i++)
 {
@@ -23,17 +23,17 @@ function callback_function(swoole_process $worker)
     $recv = $worker->pop();
 
     echo "From Master: $recv\n";
-    //$worker->push(" \n hehe \n ");//这里子进程向主进程发送  hehe
-    sleep(2);
-    $worker->exit(0);//退出子进程,0表示正常结束，会继续执行PHP的shutdown_function，其他扩展的清理工作
+    $worker->push(" \n hehe \n ");//这里子进程向主进程发送  hehe
+    //sleep(2);
+    //$worker->exit(0);//退出子进程,0表示正常结束，会继续执行PHP的shutdown_function，其他扩展的清理工作
     //多个子进程使用消息队列通讯一定写上 $process->exit(1)
-    //$worker->exit(1);
+    $worker->exit(1);
 }
 
 foreach($workers as $pid => $process)
 {
     $process->push("hello worker[$pid]\n");
-    //$result = $process->pop();
+    $result = $process->pop();
     echo "From worker: $result\n";//这里主进程，接受到的子进程的数据
 }
 
