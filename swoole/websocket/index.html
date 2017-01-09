@@ -7,12 +7,40 @@
   <script type="text/javascript">
   var exampleSocket = new WebSocket("ws://192.168.226.130:50011");
   exampleSocket.onopen = function (event) {
-    exampleSocket.send("亲爱的服务器！我连上你啦！"); 
+    //exampleSocket.send("连接服务器成功!");
   };
   exampleSocket.onmessage = function (event) {
     console.log(event.data);
-    document.getElementById("resData").value+="\n"+event.data;
+    if(event.data){
+      var data = JSON.parse(event.data);
+      var msgVal = '';
+      switch(data.type){
+        case 'self_init' :
+              msgVal += "欢迎~"+data.content.nickname+"\n";
+              break;
+        case 'connect' :
+              msgVal += data.content.nickname+"~上线啦！";
+              msgVal += "现在线人数总计"+data.content.total+"人\n";
+              break;
+        case 'message' :
+              msgVal += data.content.nickname+"说："+data.content.message+"\n";
+              break;
+        case 'disconnect' :
+              msgVal += data.content.nickname+"~已下线！\n";
+              msgVal += "现在线人数总计"+data.content.total+"人\n";
+              break;
+      }
+      document.getElementById("resData").value += msgVal;
+
+    }
+
   }
+  function sendMsg(){
+      var msgVal = document.getElementById('content').value ;
+      document.getElementById("resData").value += '我说：' + msgVal + "\n";
+      exampleSocket.send(msgVal);
+      document.getElementById('content').value = '';
+    }
   </script>
 </head>
 <body>
@@ -21,6 +49,7 @@
 </textarea>
 <br/>
 <input  type="text" id="content">
-<button  onclick="exampleSocket.send( document.getElementById('content').value )">发送</button>
+<!-- <button  onclick="exampleSocket.send( document.getElementById('content').value )">发送</button> -->
+<button  onclick="sendMsg()">发送</button>
 </body>
 </html>

@@ -18,9 +18,13 @@ $server->on('message', function (swoole_websocket_server $server, $frame) {
     $data = $frame->data;
     $m = file_get_contents( __DIR__ .'/log.txt');
     $data = $frame->data;
-    for ($i=1 ; $i<= $m ; $i++) {
+    /*for ($i=1 ; $i<= $m ; $i++) {
         echo PHP_EOL . '  i is  ' . $i .  '  data  is '.$data  . '  m = ' . $m;
         $server->push($i, $data );//循环广播
+    }*/
+    // 广播
+    foreach($server->connections as $fd) {
+        $server->push($fd, $data);
     }
     //$server->push($frame->fd, "this is server");//$frame->fd 是客户端id，$frame->data是客户端发送的数据
     //服务端向客户端发送数据是用 $server->push( '客户端id' ,  '内容')
